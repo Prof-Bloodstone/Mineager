@@ -1,0 +1,1 @@
+from mineager.plugins import *
