@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from mineager.config import YamlConfig
-from mineager.plugins import Plugin
-from typing import List
 from pathlib import Path
+from .types import PLUGIN_LIST
 import click
 
 
@@ -24,8 +23,8 @@ class Context:
         self._config_path = value
 
     @property
-    def data(self) -> List[Plugin]:
-        return YamlConfig(self.config_path).load()
+    def data(self) -> PLUGIN_LIST:
+        return YamlConfig(self.config_path).get_plugins()
 
 
 pass_context = click.make_pass_decorator(Context)
@@ -35,9 +34,10 @@ pass_context = click.make_pass_decorator(Context)
 @click.option(
     "--config-path",
     envvar="MINEAGER_CONFIG_PATH",
-    default="plugins.yml",
+    default="mineager.yml",
     metavar="PATH",
     help="Changes the config location.",
+    type=click.Path(),
 )
 @click.pass_context
 def cli(ctx, config_path: str):
@@ -52,7 +52,7 @@ def status(ctx: Context):
     for plugin in ctx.data:
         info = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
-        click.echo(f"{plugin._name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}")
+        click.echo(f"{plugin.name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}")
 
 
 @cli.command()
@@ -60,7 +60,7 @@ def status(ctx: Context):
 def download(ctx: Context):
     """Download newest available version of all the plugins."""
     for plugin in ctx.data:
-        click.echo(f"Downloading {plugin._name}")
+        click.echo(f"Downloading {plugin.name}")
         plugin.download()
 
 

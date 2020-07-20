@@ -15,9 +15,10 @@ class YamlConfig(Config):
     def load(self) -> List[Plugin]:
         with self._file.open("r") as stream:
             data = yaml.load(stream, Loader=Loader)
-        return self.parse_plugins(data)
+        return data
 
     def save(self, data) -> None:
+        # TODO: Serialize plugins
         dump = yaml.dump(
             data,
             Dumper=Dumper,

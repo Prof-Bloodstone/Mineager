@@ -20,8 +20,29 @@ class Version:
     def from_timestamp(cls, name: str, version: str, date: int, *args, **kwargs):
         return cls(name, version, datetime.fromtimestamp(date), *args, **kwargs)
 
+    def as_tuple(self) -> tuple:
+        return self.name, self.version, self.date
+
     def __str__(self) -> str:
         return f"{type(self).__name__}(name={self.name},version={self.version},date={self.date})"
+
+    @staticmethod
+    def __is_valid_operand(other):
+        required_attributes = (
+            "name",
+            "version",
+        )
+        return all(hasattr(other, attribute) for attribute in required_attributes)
+
+    def __eq__(self, other):
+        if not self.__is_valid_operand(other): return NotImplemented
+        return (self.name, self.version) == (other.name, other.version)
+
+    def __lt__(self, other):
+        if not self.__is_valid_operand(other): return NotImplemented
+        if self.name != other.name: return NotImplemented
+        # TODO: Compare versions if they are SEMVER?
+        return self.date < other.date
 
 
 class Plugin(ABC):
@@ -48,6 +69,10 @@ class Plugin(ABC):
     @abstractmethod
     def get_latest_version_info(self) -> Version:
         pass
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def latest_version(self):
