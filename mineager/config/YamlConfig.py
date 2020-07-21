@@ -12,15 +12,13 @@ except ImportError:
 
 
 class YamlConfig(Config):
-    def load(self) -> List[Plugin]:
+    def _load(self) -> List[Plugin]:
         with self._file.open("r") as stream:
-            data = yaml.load(stream, Loader=Loader)
-        return data
+            return yaml.load(stream, Loader=Loader)
 
-    def save(self, data) -> None:
-        # TODO: Serialize plugins
+    def save(self) -> None:
         dump = yaml.dump(
-            data,
+            self.data,
             Dumper=Dumper,
             # Always use block-styled instead of collection-styled dump
             default_flow_style=False,

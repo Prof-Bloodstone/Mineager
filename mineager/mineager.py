@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from mineager.config import YamlConfig
+from .config import Config, YamlConfig
+from .plugins.PluginLoader import PLUGIN_CLASSES, get_plugin
+from requests import HTTPError
 from pathlib import Path
-from .types import PLUGIN_LIST
 import click
 
 
@@ -21,13 +22,16 @@ class Context:
             else:
                 raise ValueError(f"{value!r} is not a valid type!")
         self._config_path = value
+        self._config = YamlConfig(self.config_path)
+        self._config.load()
 
     @property
-    def data(self) -> PLUGIN_LIST:
-        return YamlConfig(self.config_path).get_plugins()
+    def config(self) -> Config:
+        return self._config
 
 
 pass_context = click.make_pass_decorator(Context)
+supported_plugins = [m.type for m in PLUGIN_CLASSES]
 
 
 @click.group()
@@ -46,10 +50,30 @@ def cli(ctx, config_path: str):
 
 
 @cli.command()
+@click.option('--type', type=click.Choice(supported_plugins, case_sensitive=False), required=True, help="The type of the plugin source.")
+@click.option('--name', type=str, required=True, help="The local name for the plugin.")
+@click.option('--resource', type=str, required=True, help="The resource identifier. See documentation for details.")
+@pass_context
+def install(ctx: Context, type: str, name: str, resource: str):
+    """Installs a plugin."""
+    plugin = get_plugin(type)(name, resource)
+    try:
+        version = plugin.get_latest_version_info()
+        click.echo(f"Installing {name}, version: {version.version}")
+        plugin.download(version)
+    except HTTPError as e:
+        click.echo(e, err=True)
+        return
+
+    ctx.config.add_plugin(plugin)
+    ctx.config.save()
+
+
+@cli.command()
 @pass_context
 def status(ctx: Context):
     """Shows the current status between on-disk and remote state."""  # TODO
-    for plugin in ctx.data:
+    for plugin in ctx.config.get_plugins():
         info = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
         click.echo(f"{plugin.name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}")
@@ -59,7 +83,7 @@ def status(ctx: Context):
 @pass_context
 def download(ctx: Context):
     """Download newest available version of all the plugins."""
-    for plugin in ctx.data:
+    for plugin in ctx.config.get_plugins():
         click.echo(f"Downloading {plugin.name}")
         plugin.download()
 

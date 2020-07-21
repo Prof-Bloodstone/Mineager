@@ -47,10 +47,12 @@ class Version:
 
 class Plugin(ABC):
 
-    def __init__(self, name, resource, session: Session = Session()):
+    type: str = NotImplemented
+    _session: Session = Session()
+
+    def __init__(self, name, resource):
         self._name = name
         self._resource = resource
-        self._session = session
         self.clear_cache()
 
     def __repr__(self) -> str:
@@ -73,6 +75,10 @@ class Plugin(ABC):
     @property
     def name(self):
         return self._name
+
+    @property
+    def resource(self):
+        return self._resource
 
     @property
     def latest_version(self):

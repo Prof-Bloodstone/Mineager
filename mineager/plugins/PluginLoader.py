@@ -1,14 +1,19 @@
 
 from . import Plugin, SpigetPlugin, GithubPlugin
 
-from typing import Type
+from typing import Type, Tuple
+
+
+PLUGIN_CLASSES = (
+    SpigetPlugin,
+    GithubPlugin,
+)
 
 
 def get_plugin(name: str) -> Type[Plugin]:
     name = name.lower()
-    if name in ('spiget', 'spigot'):
-        return SpigetPlugin
-    elif name == 'github':
-        return GithubPlugin
-    else:
-        ValueError(name)
+    for cls in PLUGIN_CLASSES:
+        if name == cls.type:
+            return cls
+
+    ValueError(name)

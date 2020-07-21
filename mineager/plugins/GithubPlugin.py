@@ -13,6 +13,8 @@ class GithubPlugin(Plugin):
     _base_url = "https://api.github.com/repos"
     _datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
+    type = 'github'
+
     def get_latest_version_info(self):
         url = f"{self._base_url}/{self._resource}/releases/latest"
         response = self._get(url)
