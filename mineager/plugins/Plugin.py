@@ -35,12 +35,17 @@ class Version:
         return all(hasattr(other, attribute) for attribute in required_attributes)
 
     def __eq__(self, other):
-        if not self.__is_valid_operand(other): return NotImplemented
+        if not self.__is_valid_operand(other):
+            return NotImplemented
         return (self.name, self.version) == (other.name, other.version)
 
     def __lt__(self, other):
-        if not self.__is_valid_operand(other): return NotImplemented
-        if self.name != other.name: return NotImplemented
+        if not self.__is_valid_operand(other):
+            return NotImplemented
+        if self.name != other.name:
+            return NotImplemented
+        if hasattr(other, 'date'):
+            return NotImplemented
         # TODO: Compare versions if they are SEMVER?
         return self.date < other.date
 
@@ -56,7 +61,9 @@ class Plugin(ABC):
         self.clear_cache()
 
     def __repr__(self) -> str:
-        return f"{type(self).__name__}(name={self._name!r}, resource={self._resource!r})"
+        return (
+            f"{type(self).__name__}(name={self._name!r}, resource={self._resource!r})"
+        )
 
     def clear_cache(self):
         self.__latest_version = None
@@ -91,19 +98,21 @@ class Plugin(ABC):
             file = self.default_file_path
         if not file.exists():
             print(f"Nonexistent: {file}")
-            return None  # TODO: Throw an error
+            return None  # TODO: Throw an error?
 
         with ZipFile(file) as zipfile:
             try:
-                zipinfo = zipfile.getinfo('plugin.yml')
+                zipinfo = zipfile.getinfo("plugin.yml")
             except KeyError as e:
                 raise NotAPluginException(f"{file} does not contain plugin.yml!") from e
             # date = datetime(*zipinfo.date_time)
 
-            with zipfile.open('plugin.yml') as plug:
+            with zipfile.open("plugin.yml") as plug:
                 data = yaml.safe_load(plug)
-            version = data['version']
-            return Version.from_timestamp(name=file.stem, version=version, date=int(file.stat().st_mtime))
+            version = data["version"]
+            return Version.from_timestamp(
+                name=file.stem, version=version, date=int(file.stat().st_mtime)
+            )
 
     def _download(self, version: Version, file: Path) -> None:
         response = self._get(self.download_url(version))

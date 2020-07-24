@@ -50,9 +50,19 @@ def cli(ctx, config_path: str):
 
 
 @cli.command()
-@click.option('--type', type=click.Choice(supported_plugins, case_sensitive=False), required=True, help="The type of the plugin source.")
-@click.option('--name', type=str, required=True, help="The local name for the plugin.")
-@click.option('--resource', type=str, required=True, help="The resource identifier. See documentation for details.")
+@click.option(
+    "--type",
+    type=click.Choice(supported_plugins, case_sensitive=False),
+    required=True,
+    help="The type of the plugin source.",
+)
+@click.option("--name", type=str, required=True, help="The local name for the plugin.")
+@click.option(
+    "--resource",
+    type=str,
+    required=True,
+    help="The resource identifier. See documentation for details.",
+)
 @pass_context
 def install(ctx: Context, type: str, name: str, resource: str):
     """Installs a plugin."""
@@ -76,7 +86,9 @@ def status(ctx: Context):
     for plugin in ctx.config.get_plugins():
         info = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
-        click.echo(f"{plugin.name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}")
+        click.echo(
+            f"{plugin.name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}"
+        )
 
 
 @cli.command()

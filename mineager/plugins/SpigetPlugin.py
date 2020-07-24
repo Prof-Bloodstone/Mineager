@@ -11,7 +11,7 @@ class SpigetVersion(Version):
 class SpigetPlugin(Plugin):
     _base_url = "https://api.spiget.org/v2"
 
-    type = 'spiget'
+    type = "spiget"
 
     def get_latest_version_info(self):
         url = f"{self._base_url}/resources/{self._resource}/versions/latest"

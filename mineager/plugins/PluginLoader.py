@@ -1,4 +1,3 @@
-
 from . import Plugin, SpigetPlugin, GithubPlugin
 
 from typing import Type, Tuple

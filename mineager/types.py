@@ -1,4 +1,3 @@
-
 from typing import List, Dict
 
 from .plugins import Plugin
