@@ -3,8 +3,8 @@ from datetime import datetime
 
 
 class SpigetVersion(Version):
-    def __init__(self, name: str, date: datetime, version_id: int):
-        super().__init__(name, date)
+    def __init__(self, name: str, version_id: int, date: datetime):
+        super().__init__(name, str(version_id), date)
         self.version_id = version_id
 
 

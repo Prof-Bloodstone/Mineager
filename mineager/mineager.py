@@ -3,6 +3,7 @@ from .config import Config, YamlConfig
 from .plugins.PluginLoader import PLUGIN_CLASSES, get_plugin
 from requests import HTTPError
 from pathlib import Path
+from .utils import CLIColors
 import click
 
 
@@ -84,11 +85,19 @@ def install(ctx: Context, type: str, name: str, resource: str):
 def status(ctx: Context):
     """Shows the current status between on-disk and remote state."""  # TODO
     for plugin in ctx.config.get_plugins():
-        info = plugin.get_latest_version_info()
+        latest_version = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
-        click.echo(
-            f"{plugin.name} {info.version} was released at {info.date} - current version is {current_version.version}, downloaded at {current_version.date}"
-        )
+        msg = f"{plugin.name} {latest_version.version} was released at {latest_version.date}"
+        if current_version is None:
+            color = CLIColors.NEW
+        else:
+            msg = f"{msg} - current version is {current_version.version}, downloaded at {current_version.date}"
+            color = (
+                CLIColors.UPDATE_AVAILABLE
+                if current_version < latest_version
+                else CLIColors.UP_TO_DATE
+            )
+        click.secho(msg, fg=color.value)
 
 
 @cli.command()
@@ -96,8 +105,11 @@ def status(ctx: Context):
 def download(ctx: Context):
     """Download newest available version of all the plugins."""
     for plugin in ctx.config.get_plugins():
-        click.echo(f"Downloading {plugin.name}")
-        plugin.download()
+        current_version = plugin.version_from_file()
+        latest_version = plugin.get_latest_version_info()
+        if current_version is None or current_version < latest_version:
+            click.echo(f"Downloading {plugin.name}")
+            plugin.download()
 
 
 if __name__ == "__main__":

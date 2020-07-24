@@ -44,7 +44,7 @@ class Version:
             return NotImplemented
         if self.name != other.name:
             return NotImplemented
-        if hasattr(other, 'date'):
+        if not hasattr(other, "date"):
             return NotImplemented
         # TODO: Compare versions if they are SEMVER?
         return self.date < other.date
@@ -58,7 +58,7 @@ class Plugin(ABC):
     def __init__(self, name, resource):
         self._name = name
         self._resource = resource
-        self.clear_cache()
+        self.__latest_version = None
 
     def __repr__(self) -> str:
         return (
