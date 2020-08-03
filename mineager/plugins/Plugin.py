@@ -97,7 +97,7 @@ class Plugin(ABC):
         if file is None:
             file = self.default_file_path
         if not file.exists():
-            print(f"Nonexistent: {file}")
+            print(f"Nonexistent: {file}")  # TODO: Remove
             return None  # TODO: Throw an error?
 
         with ZipFile(file) as zipfile:
@@ -115,7 +115,10 @@ class Plugin(ABC):
             )
 
     def _download(self, version: Version, file: Path) -> None:
-        response = self._get(self.download_url(version))
+        url = self.download_url(version)
+        response = self._get(url)
+        if not response.ok and response.headers.get("server") == "cloudflare":
+            raise ManualDownloadRequired("Cloudflare blocked automatic download.", url)
         response.raise_for_status()
         utils.response_to_file(response, file)
 
@@ -132,7 +135,11 @@ class Plugin(ABC):
 
 
 class ManualDownloadRequired(Exception):
-    pass
+    def __init__(self, msg: str, url: str):
+        self._raw_msg = msg
+        self.url = url
+        self._msg = f"{msg} {url}"
+        super().__init__(self._msg)
 
 
 class NotAPluginException(Exception):

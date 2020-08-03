@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+from mineager import ManualDownloadRequired
 from .config import Config, YamlConfig
 from .plugins.PluginLoader import PLUGIN_CLASSES, get_plugin
 from requests import HTTPError
 from pathlib import Path
-from .utils import CLIColors
+from .utils import CLIColors, PluginDownloadReason
 import click
 
 
@@ -67,11 +68,26 @@ def cli(ctx, config_path: str):
 @pass_context
 def install(ctx: Context, type: str, name: str, resource: str):
     """Installs a plugin."""
+    ctx.config.get_plugins()
+    ctx.config.get_plugins()
+    if name in {p.name for p in ctx.config.get_plugins()}:
+        raise click.ClickException(
+            click.style(
+                f"A plugin with name '{name}' already exists!", fg=CLIColors.ERROR.value
+            )
+        )
     plugin = get_plugin(type)(name, resource)
     try:
         version = plugin.get_latest_version_info()
         click.echo(f"Installing {name}, version: {version.version}")
-        plugin.download(version)
+        try:
+            plugin.download(version)
+        except ManualDownloadRequired as e:
+            click.secho(
+                f"Failed to download {plugin.name} - try downloading it manually from {e.url}",
+                fg=CLIColors.WARNING.value,
+            )
+            # TODO: Should it or should it not be added to mineager.yml ?
     except HTTPError as e:
         click.echo(e, err=True)
         return
@@ -83,7 +99,7 @@ def install(ctx: Context, type: str, name: str, resource: str):
 @cli.command()
 @pass_context
 def status(ctx: Context):
-    """Shows the current status between on-disk and remote state."""  # TODO
+    """Shows the current status between on-disk and remote state."""
     for plugin in ctx.config.get_plugins():
         latest_version = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
@@ -104,12 +120,34 @@ def status(ctx: Context):
 @pass_context
 def download(ctx: Context):
     """Download newest available version of all the plugins."""
+    # TODO: https://click.palletsprojects.com/en/5.x/utils/#showing-progress-bars
+    to_download = []
     for plugin in ctx.config.get_plugins():
         current_version = plugin.version_from_file()
         latest_version = plugin.get_latest_version_info()
-        if current_version is None or current_version < latest_version:
-            click.echo(f"Downloading {plugin.name}")
-            plugin.download()
+        if current_version is None:
+            to_download.append(PluginDownloadReason(plugin, "download"))
+        elif current_version < latest_version:
+            to_download.append(PluginDownloadReason(plugin, "update"))
+    if not to_download:
+        click.secho("Everything is up to date!", fg=CLIColors.UP_TO_DATE.value)
+        return
+    to_manually_download = []
+    with click.progressbar(to_download) as bar:
+        for (plugin, reason) in bar:
+            download_reason = "Updating" if reason == "update" else "Downloading"
+            click.echo(f"{download_reason} {plugin.name}")
+            try:
+                plugin.download()
+            except ManualDownloadRequired as e:
+                to_manually_download.append((PluginDownloadReason(plugin, reason), e.url))
+    if to_manually_download:
+        click.secho(
+            "Failed to download some plugins automatically - try doing so manually:",
+            fg=CLIColors.WARNING.value,
+        )
+        for ((plugin, reason), url) in to_manually_download:
+            click.echo(f"{plugin.name}: {url}")
 
 
 if __name__ == "__main__":

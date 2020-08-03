@@ -41,6 +41,7 @@ class Config(ABC):
         if plugins_data is None:
             raise ValueError('Missing top-level key "plugins"')
         for index, entry in enumerate(plugins_data):
+            entry = entry.copy()
             type_name = entry.pop("type", None)
             if type_name is None:
                 raise ValueError(f"Required key 'type' is missing in entry {index+1}")

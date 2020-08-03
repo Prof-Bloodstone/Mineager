@@ -1,10 +1,11 @@
-from .Plugin import Plugin, Version
 from datetime import datetime
+
+from .Plugin import Plugin, Version
 
 
 class SpigetVersion(Version):
-    def __init__(self, name: str, version_id: int, date: datetime):
-        super().__init__(name, str(version_id), date)
+    def __init__(self, name: str, version: str, date: datetime, version_id: int):
+        super().__init__(name=name, version=version, date=date)
         self.version_id = version_id
 
 
@@ -19,7 +20,10 @@ class SpigetPlugin(Plugin):
         response.raise_for_status()
         json = response.json()
         version = SpigetVersion.from_timestamp(
-            name=json["name"], date=json["releaseDate"], version_id=json["id"],
+            name=json["name"],
+            date=json["releaseDate"],
+            version=json["name"],
+            version_id=json["id"],
         )
         return version
 
