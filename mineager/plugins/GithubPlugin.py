@@ -1,5 +1,6 @@
-from .Plugin import Plugin, Version
 from datetime import datetime
+
+from .Plugin import Plugin, Version
 
 
 class GithubVersion(Version):

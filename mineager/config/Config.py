@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-
-
 from typing import List
-from ..plugins import PluginLoader, Plugin
+
+from ..plugins import Plugin, PluginLoader
 from ..types import CONFIG, PLUGIN_LIST
 
 

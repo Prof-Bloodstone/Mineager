@@ -1,10 +1,8 @@
 from collections import namedtuple
-
-from requests import Response
+from enum import Enum
 from pathlib import Path
 
-from enum import Enum
-
+from requests import Response
 
 PluginDownloadReason = namedtuple("PluginDownloadReason", ["plugin", "reason"])
 

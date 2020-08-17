@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-
-from requests import Session
 from pathlib import Path
-from mineager import utils
-
+from typing import Union
 from zipfile import ZipFile
 
 import yaml
+from requests import Session
+
+from mineager import utils
 
 
 class Version:
@@ -93,16 +93,15 @@ class Plugin(ABC):
             self.__latest_version = self.get_latest_version_info()
         return self.__latest_version
 
-    def version_from_file(self, file: Path = None) -> Version:
+    def version_from_file(self, file: Path = None) -> Union[Version, None]:
         if file is None:
             file = self.default_file_path
         if not file.exists():
-            print(f"Nonexistent: {file}")  # TODO: Remove
-            return None  # TODO: Throw an error?
+            return None
 
         with ZipFile(file) as zipfile:
             try:
-                zipinfo = zipfile.getinfo("plugin.yml")
+                zipfile.getinfo("plugin.yml")
             except KeyError as e:
                 raise NotAPluginException(f"{file} does not contain plugin.yml!") from e
             # date = datetime(*zipinfo.date_time)

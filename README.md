@@ -6,20 +6,48 @@ It's a plugin manager for your Minecraft server, but not in it's traditional sen
 It provides a simple CLI to check if there are plugin updates available, and can download them for you.
 
 # How to use
-
-Create `plugins.yml` file in your minecraft server root directory and list plugins in it. For example:
-```yml
----
-- type: Spigot
-  name: "Simple Anti-Mob Lag"
-  resource: 67484
-- type: Github
-  name: WanderfulAdditions
-  resource: Prof-Bloodstone/WanderfulAdditions
-```
-Alternatively, you can pass path to your file using `--config-path` option or `MINEAGER_CONFIG_PATH` environment variable.
-
 See `mineager --help` for more information.
+
+### Install a new plugin
+##### Github.com releases
+All github repositories are in `https://github.com/<OWNER>/<REPO_NAME>`.
+Mineager uses `<OWNER>/<REPO_NAME>` part, to identify the resource.
+
+Let's say you want to install WanderfulAdditions plugin which has GH releases.
+Head over to github page: https://github.com/Prof-Bloodstone/WanderfulAdditions
+Copy resource identification (`Prof-Bloodstone/WanderfulAdditions`), and run:
+```sh
+mineager install --type github --name 'WanderfulAdditions' --resource 'Prof-Bloodstone/WanderfulAdditions'
+```
+The latest release will automatically be downloaded and installed.
+
+##### Spigot.com
+Unfortunately, Spigot download page is behind CloudFlare, which makes it not possible to automatically download plugins.
+
+Mineager will still provide information about plugin status,
+and give direct download links to manually download it.
+
+All spigot resources are under: `https://www.spigotmc.org/resources/<NAME>.<ID>/`.
+Mineager uses `<ID>` to identify the plugin.
+
+Let's say you want to install EssentialsX from Spigot website for some reason.
+From https://www.spigotmc.org/resources/essentialsx.9089/, the resource id is `9089`.
+Install it by running:
+```sh
+mineager install --type spiget --name 'EssentialsX' --resource '9089'
+```
+
+### Adding new plugins, without installing
+If you want to add new plugin to config list, without downloading it first, use the `add` command.
+Its usages is just like for `install` command.
+
+### Checking for plugin updates
+If you want to check, if there are any updates available, simply run: `mineager status`
+
+### Updating all plugins
+After checking that there are plugin updates available and you want to download newer versions,
+simply run `mineager update`. If you have a plugin that needs to be downloaded from CloudFlare protected site,
+you'll be given a direct download link for it.
 
 # Developing Mineager
 

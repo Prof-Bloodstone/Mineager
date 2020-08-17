@@ -1,39 +1,17 @@
 #!/usr/bin/env python3
-from mineager import ManualDownloadRequired
-from .config import Config, YamlConfig
-from .plugins.PluginLoader import PLUGIN_CLASSES, get_plugin
-from requests import HTTPError
-from pathlib import Path
-from .utils import CLIColors, PluginDownloadReason
 import click
+from requests import HTTPError
 
+from mineager import ManualDownloadRequired
 
-class Context:
-    def __init__(self, config_path):
-        self.config_path: Path = config_path
-
-    @property
-    def config_path(self) -> Path:
-        return self._config_path
-
-    @config_path.setter
-    def config_path(self, value) -> None:
-        if not isinstance(value, Path):
-            if isinstance(value, str):
-                value = Path(value)
-            else:
-                raise ValueError(f"{value!r} is not a valid type!")
-        self._config_path = value
-        self._config = YamlConfig(self.config_path)
-        self._config.load()
-
-    @property
-    def config(self) -> Config:
-        return self._config
-
-
-pass_context = click.make_pass_decorator(Context)
-supported_plugins = [m.type for m in PLUGIN_CLASSES]
+from .cli_utils import (
+    OPTIONS_ADD_PLUGIN,
+    ConfigContext,
+    add_options,
+    is_plugin_in_config,
+)
+from .plugins.PluginLoader import get_plugin
+from .utils import CLIColors, PluginDownloadReason
 
 
 @click.group()
@@ -48,29 +26,35 @@ supported_plugins = [m.type for m in PLUGIN_CLASSES]
 @click.pass_context
 def cli(ctx, config_path: str):
     """Command-line tool to manage plugins on your Minecraft server."""
-    ctx.obj = Context(config_path)
+    ctx.obj = ConfigContext(config_path)
 
 
 @cli.command()
-@click.option(
-    "--type",
-    type=click.Choice(supported_plugins, case_sensitive=False),
-    required=True,
-    help="The type of the plugin source.",
-)
-@click.option("--name", type=str, required=True, help="The local name for the plugin.")
-@click.option(
-    "--resource",
-    type=str,
-    required=True,
-    help="The resource identifier. See documentation for details.",
-)
-@pass_context
-def install(ctx: Context, type: str, name: str, resource: str):
+@add_options(OPTIONS_ADD_PLUGIN)
+@click.pass_obj
+def add(ctx: ConfigContext, type: str, name: str, resource: str):
+    """
+    Manually add given plugin to config file.
+    No verification is being done.
+    """
+    if is_plugin_in_config(ctx.config, type=type, name=name, resource=resource):
+        raise click.ClickException(
+            click.style(
+                f"A plugin with name '{name}' already exists!", fg=CLIColors.ERROR.value
+            )
+        )
+    plugin = get_plugin(type)(name, resource)
+    ctx.config.add_plugin(plugin)
+    ctx.config.save()
+
+
+@cli.command()
+@add_options(OPTIONS_ADD_PLUGIN)
+@click.pass_context
+def install(cctx: click.Context, type: str, name: str, resource: str):
     """Installs a plugin."""
-    ctx.config.get_plugins()
-    ctx.config.get_plugins()
-    if name in {p.name for p in ctx.config.get_plugins()}:
+    ctx: ConfigContext = cctx.obj
+    if is_plugin_in_config(ctx.config, type=type, name=name, resource=resource):
         raise click.ClickException(
             click.style(
                 f"A plugin with name '{name}' already exists!", fg=CLIColors.ERROR.value
@@ -84,28 +68,30 @@ def install(ctx: Context, type: str, name: str, resource: str):
             plugin.download(version)
         except ManualDownloadRequired as e:
             click.secho(
-                f"Failed to download {plugin.name} - try downloading it manually from {e.url}",
+                f"Failed to download {plugin.name} - try downloading it manually from {e.url} and adding it using: "
+                f"{cctx.parent.command_path} add --name {name!r} --type {type!r} --resource {resource!r}",
                 fg=CLIColors.WARNING.value,
             )
-            # TODO: Should it or should it not be added to mineager.yml ?
+            return 1
     except HTTPError as e:
         click.echo(e, err=True)
-        return
+        return 1
 
     ctx.config.add_plugin(plugin)
     ctx.config.save()
 
 
 @cli.command()
-@pass_context
-def status(ctx: Context):
+@click.pass_obj
+def status(cctx: ConfigContext):
     """Shows the current status between on-disk and remote state."""
-    for plugin in ctx.config.get_plugins():
+    for plugin in cctx.config.get_plugins():
         latest_version = plugin.get_latest_version_info()
         current_version = plugin.version_from_file()
         msg = f"{plugin.name} {latest_version.version} was released at {latest_version.date}"
         if current_version is None:
             color = CLIColors.NEW
+            msg = f"{msg} - Not Installed"
         else:
             msg = f"{msg} - current version is {current_version.version}, downloaded at {current_version.date}"
             color = (
@@ -117,12 +103,11 @@ def status(ctx: Context):
 
 
 @cli.command()
-@pass_context
-def download(ctx: Context):
-    """Download newest available version of all the plugins."""
-    # TODO: https://click.palletsprojects.com/en/5.x/utils/#showing-progress-bars
+@click.pass_obj
+def update(cctx: ConfigContext):
+    """Download newest available version of all plugins listed in config."""
     to_download = []
-    for plugin in ctx.config.get_plugins():
+    for plugin in cctx.config.get_plugins():
         current_version = plugin.version_from_file()
         latest_version = plugin.get_latest_version_info()
         if current_version is None:
@@ -140,7 +125,9 @@ def download(ctx: Context):
             try:
                 plugin.download()
             except ManualDownloadRequired as e:
-                to_manually_download.append((PluginDownloadReason(plugin, reason), e.url))
+                to_manually_download.append(
+                    (PluginDownloadReason(plugin, reason), e.url)
+                )
     if to_manually_download:
         click.secho(
             "Failed to download some plugins automatically - try doing so manually:",

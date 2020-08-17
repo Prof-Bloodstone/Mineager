@@ -1,14 +1,16 @@
-from . import Config
-from mineager.plugins import Plugin
-
 from typing import List
 
 import yaml
 
+from mineager.plugins import Plugin
+
+from . import Config
+
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Dumper, Loader
 
 
 class YamlConfig(Config):

@@ -1,7 +1,6 @@
-from . import Plugin, SpigetPlugin, GithubPlugin
+from typing import Type
 
-from typing import Type, Tuple
-
+from . import GithubPlugin, Plugin, SpigetPlugin
 
 PLUGIN_CLASSES = (
     SpigetPlugin,
