@@ -8,7 +8,16 @@ It provides a simple CLI to check if there are plugin updates available, and can
 # How to use
 See `mineager --help` for more information.
 
-### Install a new plugin
+### Install a new plugin from URL
+Mineager tries to automatically detect plugin information from URLs.
+
+To install new plugin, run `mineager plugin install <URL>`.
+It'll try to detect the name of the plugin, but it can be overwritten by `--name` option.
+
+If you want to track the plugin, but don't want to download it, run `mineager plugin add <URL>`.
+The plugin will be added to the config, and can be later downloaded with `mineager plugin update`.
+
+### Install a new plugin directly
 ##### Github.com releases
 All github repositories are in `https://github.com/<OWNER>/<REPO_NAME>`.
 Mineager uses `<OWNER>/<REPO_NAME>` part, to identify the resource.
@@ -17,7 +26,7 @@ Let's say you want to install WanderfulAdditions plugin which has GH releases.
 Head over to github page: https://github.com/Prof-Bloodstone/WanderfulAdditions
 Copy resource identification (`Prof-Bloodstone/WanderfulAdditions`), and run:
 ```sh
-mineager install --type github --name 'WanderfulAdditions' --resource 'Prof-Bloodstone/WanderfulAdditions'
+mineager plugin manual install --type github --name 'WanderfulAdditions' --resource 'Prof-Bloodstone/WanderfulAdditions'
 ```
 The latest release will automatically be downloaded and installed.
 
@@ -34,7 +43,7 @@ Let's say you want to install EssentialsX from Spigot website for some reason.
 From https://www.spigotmc.org/resources/essentialsx.9089/, the resource id is `9089`.
 Install it by running:
 ```sh
-mineager install --type spiget --name 'EssentialsX' --resource '9089'
+mineager plugin manual install --type spiget --name 'EssentialsX' --resource '9089'
 ```
 
 ### Adding new plugins, without installing
@@ -42,11 +51,11 @@ If you want to add new plugin to config list, without downloading it first, use 
 Its usages is just like for `install` command.
 
 ### Checking for plugin updates
-If you want to check, if there are any updates available, simply run: `mineager status`
+If you want to check, if there are any updates available, simply run: `mineager plugin status`
 
 ### Updating all plugins
 After checking that there are plugin updates available and you want to download newer versions,
-simply run `mineager update`. If you have a plugin that needs to be downloaded from CloudFlare protected site,
+simply run `mineager plugin update`. If you have a plugin that needs to be downloaded from CloudFlare protected site,
 you'll be given a direct download link for it.
 
 # Developing Mineager

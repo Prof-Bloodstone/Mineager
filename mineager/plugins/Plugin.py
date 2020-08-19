@@ -56,14 +56,12 @@ class Plugin(ABC):
     _session: Session = Session()
 
     def __init__(self, name, resource):
-        self._name = name
+        self.name = name
         self._resource = resource
         self.__latest_version = None
 
     def __repr__(self) -> str:
-        return (
-            f"{type(self).__name__}(name={self._name!r}, resource={self._resource!r})"
-        )
+        return f"{type(self).__name__}(name={self.name!r}, resource={self._resource!r})"
 
     def clear_cache(self):
         self.__latest_version = None
@@ -73,7 +71,7 @@ class Plugin(ABC):
 
     @property
     def default_file_path(self) -> Path:
-        return Path(f'./plugins/{self._name.replace(" ", "_")}.jar')
+        return Path(f'./plugins/{self.name.replace(" ", "_")}.jar')
 
     @abstractmethod
     def get_latest_version_info(self) -> Version:
@@ -82,6 +80,12 @@ class Plugin(ABC):
     @property
     def name(self):
         return self._name
+
+    @name.setter
+    def name(self, name: str):
+        if "/" in name:
+            raise ValueError(f"{name!r} contains invalid character - '/'")
+        self._name = name
 
     @property
     def resource(self):

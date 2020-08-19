@@ -1,8 +1,10 @@
-from typing import Type
+from typing import Iterable, Type
 
-from . import GithubPlugin, Plugin, SpigetPlugin
+from .GithubPlugin import GithubPlugin
+from .Plugin import Plugin
+from .SpigetPlugin import SpigetPlugin
 
-PLUGIN_CLASSES = (
+PLUGIN_CLASSES: Iterable[Type[Plugin]] = (
     SpigetPlugin,
     GithubPlugin,
 )

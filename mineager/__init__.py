@@ -1,3 +1,3 @@
-from mineager.plugins import *
-
+from .plugins import *
 from .types import *
+from .UrlParser import UrlParser
