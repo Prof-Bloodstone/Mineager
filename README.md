@@ -1,9 +1,11 @@
-# THIS IS NOT READY!
-
 # What is Mineager?
 
 It's a plugin manager for your Minecraft server, but not in it's traditional sense.
 It provides a simple CLI to check if there are plugin updates available, and can download them for you.
+
+# Current state
+
+Mineager is in alpha - bugs are expected.
 
 # How to use
 See `mineager --help` for more information.
@@ -16,6 +18,12 @@ It'll try to detect the name of the plugin, but it can be overwritten by `--name
 
 If you want to track the plugin, but don't want to download it, run `mineager plugin add <URL>`.
 The plugin will be added to the config, and can be later downloaded with `mineager plugin update`.
+
+##### Important note
+
+Some plugin types can extract all necessary information just from the plugin page,
+but some, i.e. Jenkins, require direct link to jar file.
+It's always safer to use full download URL.
 
 ### Install a new plugin directly
 ##### Github.com releases
