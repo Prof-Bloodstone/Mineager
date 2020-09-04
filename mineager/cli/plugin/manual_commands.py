@@ -9,6 +9,7 @@ from .utils import OPTIONS_MANUALLY_ADD_PLUGIN, try_install_plugin
 @add_options(OPTIONS_MANUALLY_ADD_PLUGIN)
 def manual_plugin_cmd():
     """Manually add/install plugins."""
+    raise click.ClickException("Manual plugin management is temporarily disabled")
 
 
 @manual_plugin_cmd.command()

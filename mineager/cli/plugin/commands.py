@@ -83,10 +83,10 @@ def update(cctx: ConfigContext):
         click.secho("Everything is up to date!", fg=CLIColors.UP_TO_DATE.value)
         return
     to_manually_download = []
-    with click.progressbar(to_download) as bar:
+    with click.progressbar(to_download, label="Downloading") as bar:
         for (plugin, reason) in bar:
             download_reason = "Updating" if reason == "update" else "Downloading"
-            click.echo(f"{download_reason} {plugin.name}")
+            bar.label = f"{download_reason} {plugin.name}"
             try:
                 plugin.download()
             except ManualDownloadRequired as e:

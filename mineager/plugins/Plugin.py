@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Union
+from typing import Any, Dict, Union
 from zipfile import ZipFile
 
 import yaml
 from requests import Session
 
 from mineager import utils
+from mineager.globals import SESSION
+
+from ..utils import get_function_kwargs
 
 
 class Version:
@@ -53,15 +56,24 @@ class Version:
 class Plugin(ABC):
 
     type: str = NotImplemented
-    _session: Session = Session()
+    _session: Session = SESSION
 
-    def __init__(self, name, resource):
-        self.name = name
+    def __init__(self, name: str, resource: Union[str, int]):
+        self.name = name.replace("-_", " ").title()
         self._resource = resource
         self.__latest_version = None
 
+    def serialize(self) -> Dict[str, Any]:
+        fields = get_function_kwargs(self.__init__)
+        return {name: getattr(self, name) for name in fields}
+
     def __repr__(self) -> str:
-        return f"{type(self).__name__}(name={self.name!r}, resource={self._resource!r})"
+        representation = f"{type(self).__qualname__}("
+        for idx, (name, value) in enumerate(self.serialize().items()):
+            representation = (
+                f"{representation}{', ' if idx != 0 else ''}{name}={value!r}"
+            )
+        return f"{representation})"
 
     def clear_cache(self):
         self.__latest_version = None
@@ -146,4 +158,8 @@ class ManualDownloadRequired(Exception):
 
 
 class NotAPluginException(Exception):
+    pass
+
+
+class InvalidPluginSourceException(Exception):
     pass

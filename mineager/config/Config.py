@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
+from ..data_types import CONFIG, PLUGIN_LIST
 from ..plugins import Plugin, PluginLoader
-from ..types import CONFIG, PLUGIN_LIST
 
 
 class Config(ABC):
@@ -50,13 +50,7 @@ class Config(ABC):
 
     @staticmethod
     def serialize_plugin(plugin: Plugin):
-        # TODO: probably should move this logic into plugin itself
-        fields = (
-            "type",
-            "name",
-            "resource",
-        )
-        return {field: getattr(plugin, field) for field in fields}
+        return dict(type=plugin.type, **plugin.serialize())
 
     def add_plugin(self, plugin: Plugin):
         plugins_data: List = self.data.get("plugins", [])
