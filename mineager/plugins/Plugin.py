@@ -46,7 +46,7 @@ class Version:
     def as_tuple(self) -> tuple:
         return self.name, self.version, self.date
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return f"{type(self).__name__}(name={self.name},version={self.version},date={self.date})"
 
     @staticmethod

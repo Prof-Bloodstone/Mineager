@@ -52,7 +52,8 @@ class GithubPlugin(Plugin):
             (
                 asset
                 for asset in json["assets"]
-                if asset["name"].lower() == f"{self._name.lower()}.jar"
+                if asset["name"].endswith(".jar")
+                and asset["name"].casefold().startswith(self._name.casefold())
             ),
             None,
         )
