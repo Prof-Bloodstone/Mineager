@@ -40,7 +40,7 @@ class SpigetPlugin(Plugin):
         response.raise_for_status()
         json = response.json()
         version = SpigetVersion.from_timestamp(
-            name=json["name"],
+            name=self.name,
             date=json["releaseDate"],
             version=json["name"],
             version_id=json["id"],

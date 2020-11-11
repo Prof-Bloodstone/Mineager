@@ -52,7 +52,9 @@ def get_plugin_from_url(url: str, name: Union[str, None]) -> Plugin:
         try:
             plugin.name = name
         except ValueError as e:
-            raise click.ClickException(f"Invalid custom name: {name!r}",) from e
+            raise click.ClickException(
+                f"Invalid custom name: {name!r}",
+            ) from e
     return plugin
 
 

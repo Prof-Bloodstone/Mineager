@@ -32,7 +32,11 @@ class WithCommonPrefix(NamedTuple):
 
 class JenkinsVersion(Version):
     def __init__(
-        self, name: str, version: str, date: datetime, download_url: str,
+        self,
+        name: str,
+        version: str,
+        date: datetime,
+        download_url: str,
     ):
         super().__init__(name, version, date)
         self.download_url = download_url

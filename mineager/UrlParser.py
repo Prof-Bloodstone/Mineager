@@ -100,17 +100,17 @@ class UrlParser:
     def _parse_jenkins(cls, url: str) -> JenkinsPlugin:
         """Parse plugin info from Jenkins URL
 
-            Example usage:
-                >>> UrlParser._parse_jenkins('https://ci.lucko.me/job/LuckPerms/1155/artifact/bukkit/build/libs/LuckPerms-Bukkit-5.1.98.jar')
-                JenkinsPlugin(name='Luckperms-Bukkit', resource='bukkit/build/libs/LuckPerms-Bukkit-5.1.98.jar', url='https://ci.lucko.me/job/LuckPerms')
-                >>> UrlParser._parse_jenkins('https://example.com')
-                Traceback (most recent call last):
-                    ...
-                mineager.UrlParser.InvalidUrlForParser: Could not find jenkins header in response from https://example.com
-                >>> UrlParser._parse_jenkins('https://ci.lucko.me/job/LuckPerms/1155/')
-                Traceback (most recent call last):
-                    ...
-                mineager.UrlParser.UrlParsingException: Unable to extract plugin info from /job/LuckPerms/1155/ - full url: https://ci.lucko.me/job/LuckPerms/1155/.
+        Example usage:
+            >>> UrlParser._parse_jenkins('https://ci.lucko.me/job/LuckPerms/1155/artifact/bukkit/build/libs/LuckPerms-Bukkit-5.1.98.jar')
+            JenkinsPlugin(name='Luckperms-Bukkit', resource='bukkit/build/libs/LuckPerms-Bukkit-5.1.98.jar', url='https://ci.lucko.me/job/LuckPerms')
+            >>> UrlParser._parse_jenkins('https://example.com')
+            Traceback (most recent call last):
+                ...
+            mineager.UrlParser.InvalidUrlForParser: Could not find jenkins header in response from https://example.com
+            >>> UrlParser._parse_jenkins('https://ci.lucko.me/job/LuckPerms/1155/')
+            Traceback (most recent call last):
+                ...
+            mineager.UrlParser.UrlParsingException: Unable to extract plugin info from /job/LuckPerms/1155/ - full url: https://ci.lucko.me/job/LuckPerms/1155/.
 
         """
         parsed_url = urlparse(url)

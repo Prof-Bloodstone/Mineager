@@ -43,7 +43,7 @@ class Config(ABC):
         if self._file.exists():
             self._data = self._load()
         elif not required:
-            self._data = {'plugins': []}
+            self._data = {"plugins": []}
         else:
             raise FileNotFoundError(self._file.name)
 
