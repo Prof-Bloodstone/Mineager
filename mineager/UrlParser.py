@@ -57,7 +57,9 @@ class UrlParser:
         url = url if urlparse(url).netloc != "" else f"http://{url}"
         for parser in cls._get_parsers():
             try:
-                return parser(url)
+                plugin = parser(url)
+                plugin.normalize_name()
+                return plugin
             except InvalidUrlForParser:
                 pass  # Try another parser
         raise NotImplementedUrlParserException(

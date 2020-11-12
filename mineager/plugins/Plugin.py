@@ -79,9 +79,12 @@ class Plugin(ABC):
     _session: Session = SESSION
 
     def __init__(self, name: str, resource: Union[str, int]):
-        self.name = name.replace("-_", " ").title()
+        self.name = name
         self._resource = resource
         self.__latest_version = None
+
+    def normalize_name(self):
+        self.name = self.name.replace("-_", " ").title()
 
     def serialize(self) -> Dict[str, Any]:
         fields = get_function_kwargs(self.__init__)
@@ -103,7 +106,7 @@ class Plugin(ABC):
 
     @property
     def default_file_path(self) -> Path:
-        return Path(f'./plugins/{self.name.replace(" ", "_")}.jar')
+        return Path(f'./plugins/{self.name.replace(" -", "_")}.jar')
 
     @abstractmethod
     def get_latest_version_info(self) -> Version:
