@@ -1,4 +1,4 @@
-package dev.bloodstone.mineager
+package dev.bloodstone.mineager.cli
 
 import picocli.CommandLine
 import java.io.IOException
