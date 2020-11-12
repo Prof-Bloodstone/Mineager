@@ -52,6 +52,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        mineager=mineager.mineager:cli
+        mineager=mineager.main:cli
     ''',
 )
