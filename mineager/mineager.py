@@ -21,8 +21,8 @@
 #
 import click
 
-from .cli.cli_utils import ConfigContext
-from .cli.plugin.commands import plugin_cmd
+from mineager.cli.cli_utils import ConfigContext
+from mineager.cli.plugin.commands import plugin_cmd
 
 
 @click.group()
