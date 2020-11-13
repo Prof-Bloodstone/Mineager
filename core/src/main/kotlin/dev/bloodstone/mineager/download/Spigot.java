@@ -1,4 +1,4 @@
-package dev.bloodstone.mineager.download;
+package dev.bloodstone.mineager.core.download;
 
 import java.net.MalformedURLException;
 import java.net.URL;
