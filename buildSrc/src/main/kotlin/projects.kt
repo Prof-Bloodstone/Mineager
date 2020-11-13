@@ -2,12 +2,10 @@ import org.gradle.api.Project
 
 import org.gradle.kotlin.dsl.*
 
-/**
- * Configures the current project as a Kotlin project by adding the Kotlin `stdlib` as a dependency.
- */
+// Not used anywhere yet
 fun Project.kotlinProject() {
     dependencies {
-        "compile"(kotlin("stdlib"))
+        "compile"(kotlin("jvm"))
     }
 }
 
