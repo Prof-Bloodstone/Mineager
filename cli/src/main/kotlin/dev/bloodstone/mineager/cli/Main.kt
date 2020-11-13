@@ -1,5 +1,6 @@
 package dev.bloodstone.mineager.cli
 
+import dev.bloodstone.mineager.core.download.SeleniumBrowser
 import mu.KotlinLogging
 import picocli.CommandLine
 import java.io.IOException
