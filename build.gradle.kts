@@ -7,13 +7,13 @@ allprojects {
   group = "dev.bloodstone.mineager"
   version = "1.0.0-SNAPSHOT"
   repositories {
-    jcenter()
+    mavenCentral()
   }
 }
 
 dependencies {
-    // Make the root project archives configuration depend on every sub-project
-    subprojects.forEach {
-        archives(it)
-    }
+  // Make the root project archives configuration depend on every sub-project
+  subprojects.forEach {
+    archives(it)
+  }
 }
