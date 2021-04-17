@@ -55,7 +55,7 @@ def add(cctx: ConfigContext, url: str, name: Union[str, None]):
 
 @plugin_cmd.command()
 @add_options(OPTIONS_ADD_PLUGIN)
-@click.pass_obj
+@click.pass_context
 def install(ctx: click.Context, url: str, name: Union[str, None]):
     """Add and install plugin source based on given URL"""
     cctx: ConfigContext = ctx.obj
