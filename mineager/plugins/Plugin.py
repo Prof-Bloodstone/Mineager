@@ -21,7 +21,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 from zipfile import ZipFile
 
 import yaml
@@ -78,9 +78,12 @@ class Plugin(ABC):
     type: str = NotImplemented
     _session: Session = SESSION
 
-    def __init__(self, name: str, resource: Union[str, int]):
+    def __init__(
+        self, name: str, resource: Union[str, int], prefix: Optional[str] = None
+    ):
         self.name = name
         self._resource = resource
+        self.prefix = prefix
         self.__latest_version = None
 
     def normalize_name(self):
@@ -125,6 +128,14 @@ class Plugin(ABC):
     @property
     def resource(self):
         return self._resource
+
+    @property
+    def prefix(self) -> str:
+        return self._prefix or self.name
+
+    @prefix.setter
+    def prefix(self, prefix: Optional[str]):
+        self._prefix = prefix
 
     @property
     def latest_version(self):

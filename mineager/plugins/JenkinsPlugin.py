@@ -90,6 +90,7 @@ class JenkinsPlugin(Plugin):
             art["relativePath"] for art in artifacts if art["fileName"].endswith(".jar")
         )
 
+        # TODO: Probably needs fixing to use self.prefix?
         paths_with_common_prefixes = (
             WithCommonPrefix(common_start_substring(self.resource, path), path)
             for path in jar_files

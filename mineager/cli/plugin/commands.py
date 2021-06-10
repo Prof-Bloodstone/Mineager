@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-from typing import Union
+from typing import Optional
 
 import click
 
@@ -31,7 +31,12 @@ from ..cli_utils import (
     assert_plugin_not_in_config,
 )
 from .manual_commands import manual_plugin_cmd
-from .utils import OPTIONS_ADD_PLUGIN, get_plugin_from_url, try_install_plugin
+from .utils import (
+    OPTIONS_ADD_PLUGIN,
+    get_plugin_from_url,
+    option_prefix,
+    try_install_plugin,
+)
 
 
 @click.group("plugin")
@@ -44,10 +49,11 @@ plugin_cmd.add_command(manual_plugin_cmd)
 
 @plugin_cmd.command()
 @add_options(OPTIONS_ADD_PLUGIN)
+@option_prefix
 @click.pass_obj
-def add(cctx: ConfigContext, url: str, name: Union[str, None]):
+def add(cctx: ConfigContext, url: str, name: Optional[str], prefix: Optional[str]):
     """Add plugin source based on given URL"""
-    plugin = get_plugin_from_url(url, name)
+    plugin = get_plugin_from_url(url, name, prefix)
     assert_plugin_not_in_config(cctx.config, plugin)
     cctx.config.add_plugin(plugin)
     cctx.config.save()
@@ -55,11 +61,12 @@ def add(cctx: ConfigContext, url: str, name: Union[str, None]):
 
 @plugin_cmd.command()
 @add_options(OPTIONS_ADD_PLUGIN)
+@option_prefix
 @click.pass_context
-def install(ctx: click.Context, url: str, name: Union[str, None]):
+def install(ctx: click.Context, url: str, name: Optional[str], prefix: Optional[str]):
     """Add and install plugin source based on given URL"""
     cctx: ConfigContext = ctx.obj
-    plugin = get_plugin_from_url(url, name)
+    plugin = get_plugin_from_url(url, name, prefix)
     assert_plugin_not_in_config(cctx.config, plugin)
     try_install_plugin(ctx, plugin)
     cctx.config.add_plugin(plugin)

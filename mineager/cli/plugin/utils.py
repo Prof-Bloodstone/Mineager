@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-from typing import Union
+from typing import Optional
 
 import click
 from requests import HTTPError
@@ -46,7 +46,7 @@ def try_install_plugin(ctx: click.Context, plugin: Plugin) -> None:
         raise click.ClickException(str(e)) from e
 
 
-def get_plugin_from_url(url: str, name: Union[str, None]) -> Plugin:
+def get_plugin_from_url(url: str, name: Optional[str], prefix: Optional[str]) -> Plugin:
     plugin = UrlParser.parse(url)
     if name:
         try:
@@ -55,6 +55,8 @@ def get_plugin_from_url(url: str, name: Union[str, None]) -> Plugin:
             raise click.ClickException(
                 f"Invalid custom name: {name!r}",
             ) from e
+    if prefix:
+        plugin.prefix = prefix
     return plugin
 
 
@@ -92,3 +94,13 @@ OPTIONS_ADD_PLUGIN = [
     click.argument("url", type=URLArgument(), required=True),
     get_name_option(required=False),
 ]
+
+option_prefix = click.option(
+    "--prefix",
+    type=str,
+    required=False,
+    help="The prefix to use when downloading from mutli-jar sources",
+    default=None,
+    show_default="(the plugin name)",
+    metavar="<prefix>",
+)

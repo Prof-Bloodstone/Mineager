@@ -53,7 +53,7 @@ class GithubPlugin(Plugin):
                 asset
                 for asset in json["assets"]
                 if asset["name"].endswith(".jar")
-                and asset["name"].casefold().startswith(self._name.casefold())
+                and asset["name"].casefold().startswith(self.prefix.casefold())
             ),
             None,
         )
