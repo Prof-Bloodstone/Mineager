@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 Prof_Bloodstone.
+# Copyright (C) 2021 Prof_Bloodstone.
 #
 # This file is part of mineager
 # (see https://github.com/Prof-Bloodstone/Mineager).

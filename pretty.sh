@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ##
-## Copyright (C) 2020 Prof_Bloodstone.
+## Copyright (C) 2021 Prof_Bloodstone.
 ##
 ## This file is part of mineager
 ## (see https://github.com/Prof-Bloodstone/Mineager).
@@ -28,7 +28,12 @@ else
   args=("${@}")
 fi
 
-licenseheaders -t ./LICENSE_TEMPLATE.md -y 2020 -o "Prof_Bloodstone" -n "mineager" -u 'https://github.com/Prof-Bloodstone/Mineager'
+licenseheaders --tmpl ./LICENSE_TEMPLATE.md \
+  --current-year \
+  --owner "Prof_Bloodstone" \
+  --projname "mineager" \
+  --projurl 'https://github.com/Prof-Bloodstone/Mineager' \
+  --exclude *.md
 isort --profile black "${args[@]}"
 autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports --exclude '__init__.py' "${args[@]}"
 black "${args[@]}"
