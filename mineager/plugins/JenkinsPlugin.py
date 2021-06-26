@@ -47,20 +47,11 @@ class JenkinsPlugin(Plugin):
 
     type = "jenkins"
 
-    def __init__(self, name: str, resource: str, url: str):
-        """resource should be a name of jar to download - will use the "closest" one"""
-        super().__init__(name=name, resource=resource)
-        self._url = url
-
-    @property
-    def url(self):
-        return self._url
-
     def _get_api_url(self, url: str):
         return f"{url}/api/json"
 
     def get_latest_version_info(self) -> JenkinsVersion:
-        url = self._get_api_url(self.url)
+        url = self._get_api_url(self.resource)
         response = self._get(url)
         response.raise_for_status()
         json = response.json()
@@ -90,9 +81,8 @@ class JenkinsPlugin(Plugin):
             art["relativePath"] for art in artifacts if art["fileName"].endswith(".jar")
         )
 
-        # TODO: Probably needs fixing to use self.prefix?
         paths_with_common_prefixes = (
-            WithCommonPrefix(common_start_substring(self.resource, path), path)
+            WithCommonPrefix(common_start_substring(self.prefix, path), path)
             for path in jar_files
         )
         file_path = sorted(
@@ -103,7 +93,7 @@ class JenkinsPlugin(Plugin):
             name=self._name,
             version=latest_build["number"],
             date=json["timestamp"] // 1000,  # It's in ms
-            download_url=f"{latest_url}/{file_path.original}",
+            download_url=f"{latest_url}/artifact/{file_path.original}",
         )
         return version
 
