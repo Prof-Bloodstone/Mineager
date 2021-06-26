@@ -18,10 +18,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
+import dataclasses
+import enum
+import io
+import json
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 from zipfile import ZipFile
 
 import yaml
@@ -31,6 +35,18 @@ from mineager import utils
 from mineager.globals import SESSION
 
 from ..utils import get_function_kwargs
+
+
+@dataclasses.dataclass(frozen=True)
+class PluginPlatformInfo:
+    config_file: str
+    loader: Callable[[io.TextIOBase], Any]
+
+
+@enum.unique
+class PluginPlatform(enum.Enum):
+    PAPER = PluginPlatformInfo("plugin.yml", yaml.safe_load)
+    VELOCITY = PluginPlatformInfo("velocity-plugin.json", json.load)
 
 
 class Version:
@@ -143,21 +159,34 @@ class Plugin(ABC):
             self.__latest_version = self.get_latest_version_info()
         return self.__latest_version
 
-    def version_from_file(self, file: Path = None) -> Union[Version, None]:
+    def get_platform(self, file: Path) -> PluginPlatform:
         if file is None:
             file = self.default_file_path
         if not file.exists():
             return None
 
         with ZipFile(file) as zipfile:
-            try:
-                zipfile.getinfo("plugin.yml")
-            except KeyError as e:
-                raise NotAPluginException(f"{file} does not contain plugin.yml!") from e
+            for platform in PluginPlatform:
+                try:
+                    zipfile.getinfo(platform.value.config_file)
+                    return platform
+                except KeyError:
+                    pass
+            raise NotAPluginException(f"{file} doesn't have plugin configs!")
+
+    def version_from_file(self, file: Path = None) -> Union[Version, None]:
+        if file is None:
+            file = self.default_file_path
+        if not file.exists():
+            return None
+
+        platform = self.get_platform(file)
+
+        with ZipFile(file) as zipfile:
             # date = datetime(*zipinfo.date_time)
 
-            with zipfile.open("plugin.yml") as plug:
-                data = yaml.safe_load(plug)
+            with zipfile.open(platform.value.config_file) as plug:
+                data = platform.value.loader(plug)
             version = data["version"]
             return Version.from_timestamp(
                 name=file.stem, version=version, date=int(file.stat().st_mtime)
