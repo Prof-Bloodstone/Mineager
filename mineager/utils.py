@@ -21,6 +21,7 @@
 from inspect import getfullargspec
 from pathlib import Path
 from typing import Any, Callable, Iterable
+import difflib
 
 from requests import Response
 
@@ -53,6 +54,18 @@ def common_start_substring(sa, sb):
                 return
 
     return "".join(_iter())
+
+def longest_common_substring(sa, sb):
+    """
+        Return longest common substring between the two strings
+
+        >>> full_path = "bukkit/loader/build/libs/LuckPerms-Bukkit-5.3.50.jar"
+        >>> longest_common_substring("LuckPerms-Bukkit.jar", full_path)
+        Match(a=0, b=25, size=16)
+        >>> full_path[_.b:_.b+_.size]
+        "LuckPerms-Bukkit"
+    """
+    return difflib.SequenceMatcher(None, sa, sb).find_longest_match()
 
 
 def response_to_file(response: Response, file: Path) -> None:

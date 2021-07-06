@@ -31,7 +31,7 @@ class UrlParser:
     _spigot_regexp = re.compile(
         r"^/resources/(?P<name>[-a-zA-Z]+)(?:-\d[\w-]*)?\.(?P<resource>\d+)/"
     )
-    _github_regexp = re.compile(r"^/(?P<resource>[-\w]+/(?P<name>\w+))")
+    _github_regexp = re.compile(r"^/(?P<resource>[^/]+/(?P<name>[^/]+))")
     _jenkins_regexp = re.compile(
         r"^(?P<sub_url>(?:/job/[^/]+)+)/(?P<build>\d+)(?P<path>/artifact/(?P<jar_name>.+\.jar$))"
     )
@@ -80,7 +80,7 @@ class UrlParser:
             )
         name = match["name"]
         resource = match["resource"]
-        return SpigetPlugin(name, resource)
+        return SpigetPlugin(name=name, resource=resource)
 
     @classmethod
     def _parse_github(cls, url: str) -> GithubPlugin:
@@ -96,7 +96,7 @@ class UrlParser:
             )
         name = match["name"]
         resource = match["resource"]
-        return GithubPlugin(name, resource)
+        return GithubPlugin(name=name, resource=resource)
 
     @classmethod
     def _parse_jenkins(cls, url: str) -> JenkinsPlugin:
@@ -127,11 +127,11 @@ class UrlParser:
             raise UrlParsingException(
                 f"Unable to extract plugin info from {parsed_url.path} - full url: {url}."
             )
-        resource = match["jar_name"]
-        name_match = cls._name_regexp.match(os.path.basename(resource))
-        name = name_match["name"] if name_match else resource
-        job_url = parsed_url._replace(path=match["sub_url"]).geturl()
-        return JenkinsPlugin(name, resource, job_url)
+        prefix = match["jar_name"]
+        name_match = cls._name_regexp.match(os.path.basename(prefix))
+        name = name_match["name"] if name_match else prefix
+        resource = parsed_url._replace(path=match["sub_url"]).geturl()
+        return JenkinsPlugin(name=name, resource=resource, prefix=prefix)
 
 
 class InvalidUrlForParser(Exception):

@@ -21,7 +21,7 @@
 from datetime import datetime
 from typing import NamedTuple
 
-from ..utils import common_start_substring
+from ..utils import longest_common_substring
 from .Plugin import InvalidPluginSourceException, Plugin, Version
 
 
@@ -58,7 +58,7 @@ class JenkinsPlugin(Plugin):
         builds = json.get("builds")
         if not builds or len(builds) == 0:
             raise InvalidPluginSourceException(
-                f"Looks like {self.url} doesn't have any builds!"
+                f"Looks like {self.resource} doesn't have any builds!"
             )
         latest_build = builds[0]
         latest_url = latest_build["url"]
@@ -82,7 +82,7 @@ class JenkinsPlugin(Plugin):
         )
 
         paths_with_common_prefixes = (
-            WithCommonPrefix(common_start_substring(self.prefix, path), path)
+            WithCommonPrefix(longest_common_substring(self.prefix, path), path)
             for path in jar_files
         )
         file_path = sorted(
