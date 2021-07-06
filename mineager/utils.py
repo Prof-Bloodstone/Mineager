@@ -65,7 +65,8 @@ def longest_common_substring(sa, sb):
         >>> full_path[_.b:_.b+_.size]
         "LuckPerms-Bukkit"
     """
-    return difflib.SequenceMatcher(None, sa, sb).find_longest_match()
+    match = difflib.SequenceMatcher(None, sa, sb).find_longest_match()
+    return sa[match.a:match.a+match.size]
 
 
 def response_to_file(response: Response, file: Path) -> None:
