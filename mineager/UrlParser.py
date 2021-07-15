@@ -33,7 +33,7 @@ class UrlParser:
     )
     _github_regexp = re.compile(r"^/(?P<resource>[^/]+/(?P<name>[^/]+))")
     _jenkins_regexp = re.compile(
-        r"^(?P<sub_url>(?:/job/[^/]+)+)/(?P<build>\d+)(?P<path>/artifact/(?P<jar_name>.+\.jar$))"
+        r"^/*(?P<sub_url>(?:/job/[^/]+)+)/(?P<build>(?:\d+|last(?:Successful|Stable|Failed|Unsuccessful)Build))(?P<path>/artifact/(?P<jar_name>.+\.jar$))"
     )
 
     _name_regexp = re.compile("^(?P<name>[-a-zA-Z_]+[a-zA-Z])")
