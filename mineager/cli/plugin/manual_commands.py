@@ -26,14 +26,13 @@ from .utils import OPTIONS_MANUALLY_ADD_PLUGIN, try_install_plugin
 
 
 @click.group("manual")
-@add_options(OPTIONS_MANUALLY_ADD_PLUGIN)
 def manual_plugin_cmd():
     """Manually add/install plugins."""
-    raise click.ClickException("Manual plugin management is temporarily disabled")
 
 
 @manual_plugin_cmd.command()
 @click.pass_obj
+@add_options(OPTIONS_MANUALLY_ADD_PLUGIN)
 def add(cctx: ConfigContext, type: str, name: str, resource: str):
     """
     Manually add given plugin to config file.
@@ -47,6 +46,7 @@ def add(cctx: ConfigContext, type: str, name: str, resource: str):
 
 @manual_plugin_cmd.command()
 @click.pass_context
+@add_options(OPTIONS_MANUALLY_ADD_PLUGIN)
 def install(ctx: click.Context, type: str, name: str, resource: str):
     """Manually add and install the plugin."""
     cctx: ConfigContext = ctx.obj

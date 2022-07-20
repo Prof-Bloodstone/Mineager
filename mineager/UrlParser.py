@@ -117,7 +117,7 @@ class UrlParser:
         """
         parsed_url = urlparse(url)
         base_url = parsed_url._replace(path="").geturl()
-        req = cls._session.get(base_url)
+        req = cls._session.head(base_url)
         if "x-jenkins" not in req.headers:
             raise InvalidUrlForParser(
                 f"Could not find jenkins header in response from {base_url}"

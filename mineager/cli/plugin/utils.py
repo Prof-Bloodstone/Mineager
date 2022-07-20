@@ -40,7 +40,7 @@ def try_install_plugin(ctx: click.Context, plugin: Plugin) -> None:
         except ManualDownloadRequired as e:
             raise click.ClickException(
                 f"Failed to download {plugin.name} - try downloading it manually from {e.url} and adding it using: "
-                f"{ctx.parent.command_path} manual add --name {plugin.name!r} --type {type!r} --resource {plugin.resource!r}"
+                f"{ctx.parent.command_path} manual add --name {plugin.name!r} --type {plugin.type!r} --resource {plugin.resource!r}"
             )
     except HTTPError as e:
         raise click.ClickException(str(e)) from e
